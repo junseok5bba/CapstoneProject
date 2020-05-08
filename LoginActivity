@@ -1,0 +1,13 @@
+package com.sample.walkcourse
+
+import android.os.Bundle
+import com.sample.basefirebase.FirebaseLoginActivity
+import kotlinx.android.synthetic.main.activity_login.*
+
+class LoginActivity : FirebaseLoginActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_login)
+        btn_login_google.setOnClickListener { googleLogin() }
+    }
+}
