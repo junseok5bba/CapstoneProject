@@ -1,0 +1,20 @@
+package com.sample.walkcourse.ui.home
+
+import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.RecyclerView
+import com.sample.walkcourse.ui.home.DataBoundListener
+
+/**
+ * A generic ViewHolder that works with a [ViewDataBinding].
+ * @param <T> The type of the ViewDataBinding.
+</T> */
+class DataBoundViewHolder constructor(
+        val binding: ViewDataBinding,
+        val getBindingCallback: (binding: ViewDataBinding) -> Unit) :
+    RecyclerView.ViewHolder(binding.root),
+    DataBoundListener {
+
+    override fun event() {
+        getBindingCallback.invoke(binding)
+    }
+}
