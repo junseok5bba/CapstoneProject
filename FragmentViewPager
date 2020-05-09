@@ -1,0 +1,103 @@
+package com.sample.walkcourse.ui.home
+
+import android.content.Context
+import android.os.Bundle
+import android.util.AttributeSet
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager.widget.ViewPager
+
+class FragmentViewPager : ViewPager {
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+
+    lateinit var listener: OnFragmentListener
+
+    private val pageAdapterListener = object: OnPageChangeListener {
+        override fun onPageScrollStateChanged(state: Int) { }
+        override fun onPageScrolled(
+            position: Int,
+            positionOffset: Float,
+            positionOffsetPixels: Int
+        ) {
+        }
+
+        override fun onPageSelected(position: Int) {
+        }
+    }
+
+    fun init(fm: FragmentManager, list: List<PagerFragmentItem>) {
+        adapter = FragmentViewPagerAdapter(list, fm)
+        addOnPageChangeListener(pageAdapterListener)
+    }
+
+    fun getFragment(title: String, resId: Int, listener: OnFragmentListener): PagerFragmentItem =
+        PagerFragmentItem(
+            title,
+            newInstance(
+                resId,
+                listener
+            )
+        )
+
+    private inner class FragmentViewPagerAdapter(
+        private val fragments: List<PagerFragmentItem>,
+        fm: FragmentManager) :
+        FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        override fun getItem(position: Int): PagerFragment<ViewDataBinding> = fragments[position].fragment
+        override fun getCount(): Int = fragments.size
+        override fun getPageTitle(position: Int): CharSequence? = fragments[position].title
+    }
+
+    class PagerFragment<D : ViewDataBinding>: Fragment() {
+        lateinit var binding : D
+        lateinit var li: OnFragmentListener
+
+        private val layoutRes by lazy { arguments?.getInt(KEY_LAYOUT_RES)?:0 }
+
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+            binding = DataBindingUtil.inflate(inflater, layoutRes, container, false)
+            return binding.root
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            li.onViewCreated(binding)
+        }
+
+        companion object {
+
+        }
+    }
+
+    data class PagerFragmentItem(
+        val title: String,
+        val fragment: PagerFragment<ViewDataBinding>
+    )
+
+    companion object {
+        private const val KEY_LAYOUT_RES = "layout_res"
+
+        fun newInstance(resId: Int, listener: OnFragmentListener) = PagerFragment<ViewDataBinding>().apply {
+            arguments = Bundle().apply {
+                putInt(KEY_LAYOUT_RES, resId)
+                li = listener
+            }
+        }
+    }
+
+    interface OnFragmentListener {
+        fun onViewCreated(binding: ViewDataBinding)
+    }
+}
