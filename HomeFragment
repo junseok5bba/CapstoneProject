@@ -1,0 +1,66 @@
+package com.sample.walkcourse.ui.home
+
+import android.content.Intent
+import android.graphics.Color
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.sample.walkcourse.R
+import com.sample.walkcourse.databinding.FragmentBikeBinding
+import com.sample.walkcourse.databinding.FragmentHomeBinding
+import com.sample.walkcourse.databinding.FragmentWalkBinding
+import com.sample.walkcourse.extension.getJsonAsset
+import com.sample.walkcourse.ui.DetailActivity
+import com.sample.walkcourse.ui.home.data.CourseData
+
+class HomeFragment : Fragment() {
+
+    private lateinit var homeViewModel: HomeViewModel
+
+    lateinit var bind: FragmentHomeBinding
+
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
+        homeViewModel =
+                ViewModelProviders.of(this).get(HomeViewModel::class.java)
+
+        bind = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
+
+        return bind.root
+    }
+
+    private fun home(home: FragmentHomeBinding) {
+        val click = { course: CourseData ->
+            startActivity(Intent(home.root.context, DetailActivity::class.java).apply {
+                putExtra("course", course)
+            })
+        }
+
+        val jsonString = home.root.context.getJsonAsset("sample.json")
+
+        val type = object :TypeToken<ArrayList<CourseData>>(){}.type
+        val course = Gson().fromJson<ArrayList<CourseData>>(jsonString, type)
+
+        home.walkListView.adapter = CourseAdapter(click).apply {
+            submitList(course)
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        home(bind)
+    }
+}
