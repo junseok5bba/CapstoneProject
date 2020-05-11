@@ -1,0 +1,100 @@
+package com.sample.walkcourse.ui.home
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.annotation.LayoutRes
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.LiveData
+import androidx.recyclerview.widget.RecyclerView
+
+abstract class BaseRecyclerViewAdapter<T, B> : RecyclerView.Adapter<DataBoundViewHolder>() {
+    private val list = arrayListOf<T>()
+    private var listener: DataBoundListener? = null
+    private var viewEvent: (() -> Unit)? = null
+    private var listeners = mutableListOf<DataBoundListener>()
+
+    protected abstract val layoutRes: Int
+
+    fun remove(item: T) {
+        val index = list.indexOf(item)
+        if (index != -1) {
+            list.removeAt(index)
+            notifyItemRemoved(index)
+        }
+    }
+
+    fun removePosition(position: Int) {
+        if (position < list.size) {
+            list.removeAt(position)
+            notifyDataSetChanged()
+        }
+    }
+
+    fun update(index: Int, item: T) {
+        if (index < list.size) {
+            list[index] = item
+            notifyDataSetChanged()
+        }
+    }
+
+    fun add(item: T) {
+        list.add(item)
+        notifyDataSetChanged()
+    }
+
+    fun addAt(index: Int, item: T) {
+        if (index < list.size) {
+            list.add(index, item)
+            notifyDataSetChanged()
+        }
+    }
+
+    fun submitList(list: List<T>) {
+        this.list.clear()
+        this.list.addAll(list)
+        notifyDataSetChanged()
+    }
+
+    fun getList(): List<T> = list
+    fun getItem(index: Int): T? = if (list.size > index) list[index] else null
+
+    fun invokeEvent() {
+        listeners.forEach {
+            it.event()
+        }
+
+        //listener?.event()
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DataBoundViewHolder {
+        val binding = DataBindingUtil
+            .inflate<ViewDataBinding>(
+                LayoutInflater.from(parent.context),
+                layoutRes,
+                parent,
+                false
+            )
+        val bindingEvent = bindingEvent()
+        val holder = DataBoundViewHolder(binding, bindingEvent)
+
+        val ls: DataBoundListener = holder
+        listeners.add(ls)
+
+        return holder
+    }
+
+    override fun onBindViewHolder(holder: DataBoundViewHolder, position: Int) {
+        if (list.size > 0) {
+            bind(holder.binding as B, list[position], position)
+        }
+
+        holder.binding.executePendingBindings()
+    }
+
+    override fun getItemCount(): Int = list.size
+
+    protected abstract fun bindingEvent(): ((binding: ViewDataBinding) -> Unit)
+    protected abstract fun bind(binding: B, item: T, position: Int)
+}
