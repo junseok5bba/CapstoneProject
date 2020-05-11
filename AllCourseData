@@ -1,0 +1,40 @@
+package com.sample.walkcourse.ui.home.data
+
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+
+class AllCourseData {
+    fun htmls() {
+        var factory = DocumentBuilderFactory.newInstance()
+        var builder = factory.newDocumentBuilder()
+        var doc = builder.parse("")
+        var element = doc.documentElement
+        var nodeList = element.getElementsByTagName("title")
+
+        nodeList.length
+        nodeList.item(0).nodeName
+    }
+}package com.sample.walkcourse.ui.home.data
+
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+
+@Parcelize
+data class CourseData(
+    val id: Int,
+    val walk_name: String,
+    val course_name: String,
+    val course_desc: String,
+    val locale_main: String,
+    val locale_sub: String?,
+    val level: Int,
+    val distance: String,
+    val distance_km: Float,
+    val desc: String,
+    val time: String,
+    val water: String,
+    val toilet: String,
+    val mart: String,
+    val gpx: String
+) : Parcelable
