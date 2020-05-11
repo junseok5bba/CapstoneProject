@@ -1,0 +1,24 @@
+package com.sample.walkcourse.ui.home.data
+
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+
+@Parcelize
+data class CourseData(
+    val id: Int,
+    val walk_name: String,
+    val course_name: String,
+    val course_desc: String,
+    val locale_main: String,
+    val locale_sub: String?,
+    val level: Int,
+    val distance: String,
+    val distance_km: Float,
+    val desc: String,
+    val time: String,
+    val water: String,
+    val toilet: String,
+    val mart: String,
+    val gpx: String
+) : Parcelable
