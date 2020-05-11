@@ -1,0 +1,24 @@
+package com.sample.walkcourse.search
+
+import androidx.databinding.ViewDataBinding
+import com.sample.walkcourse.R
+import com.sample.walkcourse.databinding.ItemWalkBinding
+import com.sample.walkcourse.ui.home.BaseRecyclerViewAdapter
+import com.sample.walkcourse.ui.home.data.CourseData
+
+class SearchAdapter(val click: (course: CourseData) -> Unit) : BaseRecyclerViewAdapter<CourseData, ItemWalkBinding>() {
+    override val layoutRes: Int = R.layout.item_walk
+    override fun bindingEvent(): (binding: ViewDataBinding) -> Unit = {}
+
+    override fun bind(binding: ItemWalkBinding, item: CourseData, position: Int) {
+        with(binding) {
+            //title.text = item.title
+            root.setOnClickListener { click(item) }
+            title.text = item.walk_name + " " + item.course_name
+            locale.text = item.locale_main
+            lengthDistance.text = item.distance_km.toString() + "km"
+            time.text = item.time
+            level.text = item.level
+        }
+    }
+}
