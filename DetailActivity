@@ -61,3 +61,99 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
         detail_water.text = course.water
         detail_mart.text = course.mart
 }
+
+private fun gpx(name: String, googleMap: GoogleMap) {
+        val mParser = GPXParser() // con    sider injection
+        var parsedGpx: Gpx? = null
+
+        val input  = getJsonAsset(name)
+        val inputStream = ByteArrayInputStream(input.toByteArray(Charsets.UTF_8))
+
+        try {
+            parsedGpx = mParser.parse(inputStream)
+        } catch (e: IOException) { // do something with this exception
+            e.printStackTrace()
+        } catch (e: XmlPullParserException) {
+            e.printStackTrace()
+        }
+        if (parsedGpx == null) { // error parsing track
+        } else {
+            var swit = false
+            parsedGpx?.let { gpx ->
+                gpx.routes.forEach {
+                    //Log.d("DetailActivity" + it.)
+                }
+
+                gpx.tracks.forEach {
+
+
+                    it.trackSegments.forEach {
+                        val bound = arrayListOf<LatLngBounds>()
+                        val builder = LatLngBounds.builder()
+
+                        it.trackPoints.forEachIndexed { index, trackPoint ->
+                            if (index == 0) {
+                                googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(trackPoint.latitude, trackPoint.longitude)))
+                            }
+
+                            builder.include(LatLng(trackPoint.latitude, trackPoint.longitude))
+
+                            if (index != 0) {
+                                val previous = it.trackPoints[index-1]
+                                val line: Polyline = googleMap.addPolyline(
+                                    PolylineOptions()
+                                        .add(LatLng(previous.latitude, previous.longitude), LatLng(trackPoint.latitude, trackPoint.longitude))
+                                        .width(5f)
+                                        .color(Color.RED)
+                                )
+                            }
+
+                            bound.add(builder.build())
+                            Log.d("DetailActivity", trackPoint.latitude.toString())
+                            Log.d("DetailActivity", trackPoint.longitude.toString())
+                        }
+
+                        if (bound.isNotEmpty()) {
+                            if (!swit) {
+                                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 50))
+                                swit = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun kml(name: String, googleMap: GoogleMap) {
+
+        val builder = LatLngBounds.builder()
+
+        Log.d("File ", name)
+        val input  = getJsonAsset(name)
+        val kmlInputStream = ByteArrayInputStream(input.toByteArray(Charsets.UTF_8))
+        val layer = KmlLayer(googleMap, kmlInputStream, applicationContext)
+        layer.addLayerToMap()
+
+        Log.d("hasPlaceMarks", layer.hasPlacemarks().toString())
+    }
+
+    override fun onMapReady(googleMap: GoogleMap?) {
+        googleMap?.let {
+            googleMap.uiSettings.isZoomControlsEnabled = true
+            googleMap.setOnMapLoadedCallback {
+
+                val ext = course.gpx.substring(course.gpx.length-3, course.gpx.length)
+
+                Log.d("course.gpx ", course.gpx)
+                Log.d("course.gpx ", ext)
+
+                if (ext == "gpx") {
+                    gpx(course.gpx, googleMap)
+                } else if (ext == "kml") {
+                    kml(course.gpx, googleMap)
+                }
+            }
+        }
+
+    }
