@@ -60,6 +60,39 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
         detail_toilit.text = course.toilet
         detail_water.text = course.water
         detail_mart.text = course.mart
+        comment_confirm.setOnClickListener {
+            val text = input_text.text.toString()
+            if (FirebaseAuth.getInstance().currentUser != null) {
+                if (text.isEmpty()) {
+                    toast("댓글을 입력해 주세요")
+                } else {
+                    FirebaseDatabase.getInstance().getReference("Comment").push().setValue(Comment(
+                        0, FirebaseAuth.getInstance().currentUser?.displayName!!, text, "2020/05/21"
+                    )).addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            toast("댓글 쓰기 성공")
+                        }
+                    }
+                }
+            } else {
+                toast("로그인을 해주세요")
+            }
+        }
+
+        FirebaseDatabase.getInstance().getReference("Comment").child(course.id.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) { }
+            override fun onDataChange(p0: DataSnapshot) {
+                val list = arrayListOf<Comment>()
+                p0.children.forEach {
+                    val comment = it.getValue(Comment::class.java)
+                    comment?.let { list.add(it) }
+                }
+
+                comment_list_view.adapter = CommentAdapter().apply {
+                    submitList(list)
+                }
+            }
+        })
 }
 
 private fun gpx(name: String, googleMap: GoogleMap) {
