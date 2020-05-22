@@ -41,6 +41,39 @@ class HomeFragment : Fragment() {
 
         return bind.root
     }
+    private fun setCourse(home: FragmentHomeBinding, filter: String) {
+        val click = { course: CourseData ->
+            startActivity(Intent(home.root.context, DetailActivity::class.java).apply {
+                putExtra("course", course)
+            })
+        }
+        val jsonString = home.root.context.getJsonAsset("sample.json")
+
+        val type = object :TypeToken<ArrayList<CourseData>>(){}.type
+        var course = Gson().fromJson<ArrayList<CourseData>>(jsonString, type)
+
+        var courseResult = listOf<CourseData>()
+        when(filter) {
+            "distance" -> {
+                courseResult = course.sortedBy { it.distance_km }
+            }
+
+            "course" -> {
+                courseResult = course.sortedBy { it.distance_km }
+            }
+
+            "time" -> {
+                courseResult = course.sortedBy { it.time }
+            }
+
+            "level" -> {
+                courseResult = course.sortedBy { it.level }
+            }
+        }
+        home.walkListView.adapter = CourseAdapter(click).apply {
+            submitList(courseResult)
+        }
+    }
 
     private fun home(home: FragmentHomeBinding) {
         val click = { course: CourseData ->
