@@ -76,19 +76,23 @@ class HomeFragment : Fragment() {
     }
 
     private fun home(home: FragmentHomeBinding) {
-        val click = { course: CourseData ->
-            startActivity(Intent(home.root.context, DetailActivity::class.java).apply {
-                putExtra("course", course)
-            })
-        }
+        setCourse(home, "course")
 
-        val jsonString = home.root.context.getJsonAsset("sample.json")
 
-        val type = object :TypeToken<ArrayList<CourseData>>(){}.type
-        val course = Gson().fromJson<ArrayList<CourseData>>(jsonString, type)
-
-        home.walkListView.adapter = CourseAdapter(click).apply {
-            submitList(course)
+        home.filter.setOnClickListener {
+            TextBottomSheet.Builder(it.context)
+                .keys(listOf("course", "time", "level"))
+                .textFontSize(16.0f)
+                .focus(focusPosition)
+                .listener(object: TextBottomSheet.OnTextClickListener {
+                    override fun onClickItem(index: Int, text: String, key: String) {
+                        focusPosition = index
+                        setCourse(home, key)
+                        bind.filter.text = text
+                    }
+                })
+                .build()
+                .show()
         }
     }
 
