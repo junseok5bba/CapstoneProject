@@ -1,0 +1,15 @@
+package com.sample.walkcourse.ui.comment
+
+import androidx.databinding.ViewDataBinding
+import com.sample.walkcourse.R
+import com.sample.walkcourse.databinding.ItemCommentBinding
+import com.sample.walkcourse.ui.home.BaseRecyclerViewAdapter
+
+class CommentAdapter : BaseRecyclerViewAdapter<Comment, ItemCommentBinding>() {
+    override val layoutRes: Int = R.layout.item_comment
+    override fun bindingEvent(): (binding: ViewDataBinding) -> Unit = {}
+
+    override fun bind(binding: ItemCommentBinding, item: Comment, position: Int) {
+        binding.comment = item
+    }
+}
