@@ -1,0 +1,57 @@
+ private fun bindingComment(binding: FragmentCommentBinding) {
+        var checkedRating = 5.0f
+        binding.radioGroup.setOnCheckedChangeListener { p0, p1 ->
+            when(p1) {
+                R.id.one_point -> { checkedRating = 1.0f }
+                R.id.two_point -> { checkedRating = 2.0f }
+                R.id.three_point -> { checkedRating = 3.0f }
+                R.id.four_point -> { checkedRating = 4.0f }
+                R.id.five_point -> { checkedRating = 5.0f }
+            }
+        }
+
+        binding.commentConfirm.setOnClickListener {
+            val text = binding.inputText.text.toString()
+            if (FirebaseAuth.getInstance().currentUser != null) {
+                if (text.isEmpty()) {
+                    toast("댓글을 입력해 주세요")
+                } else {
+                    showProgress()
+                    val sp = SimpleDateFormat("yyyy/MM/dd", Locale.KOREAN)
+
+                    val time = sp.format(Date().apply {
+                        time = System.currentTimeMillis()
+                    })
+
+                    FirebaseDatabase.getInstance().getReference("Comment").child(course.id.toString()).push().setValue(Comment(
+                        FirebaseAuth.getInstance().uid?:"", FirebaseAuth.getInstance().currentUser?.displayName!!, text, time, checkedRating
+                    )).addOnCompleteListener {
+                        dismissProgress()
+                        if (it.isSuccessful) {
+                            toast("댓글 쓰기 성공")
+                            (binding.commentListView.adapter as CommentAdapter).add(
+                                Comment(FirebaseAuth.getInstance().uid?:"", FirebaseAuth.getInstance().currentUser?.displayName!!, text, time, checkedRating)
+                            )
+                        }
+                    }
+                }
+            } else {
+                toast("로그인을 해주세요")
+            }
+        }
+
+        FirebaseDatabase.getInstance().getReference("Comment").child(course.id.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) { }
+            override fun onDataChange(p0: DataSnapshot) {
+                val list = arrayListOf<Comment>()
+                p0.children.forEach {
+                    val comment = it.getValue(Comment::class.java)
+                    comment?.let { list.add(it) }
+                }
+
+                binding.commentListView.adapter = CommentAdapter().apply {
+                    submitList(list)
+                }
+            }
+        })
+    }
