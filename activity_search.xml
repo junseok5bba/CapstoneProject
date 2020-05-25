@@ -6,16 +6,22 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/input_search"
+    <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    </androidx.appcompat.widget.SearchView>
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/input_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </androidx.appcompat.widget.SearchView>
+    </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_list_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"></androidx.recyclerview.widget.RecyclerView>
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
+    </androidx.recyclerview.widget.RecyclerView>
 </LinearLayout>
