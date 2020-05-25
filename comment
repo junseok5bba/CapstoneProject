@@ -1,0 +1,13 @@
+package com.sample.walkcourse.ui.comment
+
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
+data class Comment (
+    var id: String = "",
+    var name: String = "",
+    var text: String = "",
+    var date: String = "",
+    var rate: Float = 5.0f
+) : Parcelable
