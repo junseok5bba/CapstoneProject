@@ -54,7 +54,12 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
         detail_title.text = course.walk_name + " " + course.course_name
         length_distance.text = course.distance_km.toString() + "km"
         time.text = course.time
-        level.text = course.level
+        level.text = when(course.level) {
+            1 -> "쉬움"
+            2 -> "보통"
+            3 -> "어려움"
+            else -> ""
+        }
 
         detail_course_desc.text = course.course_desc
         detail_toilit.text = course.toilet
