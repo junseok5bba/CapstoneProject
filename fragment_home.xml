@@ -16,6 +16,18 @@
             android:layout_gravity="center"
             android:src="@drawable/main_logo"/>
 
+        <TextView
+            android:id="@+id/filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:layout_gravity="end"
+            android:padding="8dp"
+            android:text="코스거리순"
+            android:textSize="16sp">
+
+        </TextView>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/walk_list_view"
             android:layout_width="match_parent"
