@@ -66,7 +66,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/detail_title"
-            android:text="경로 안내"/>
+            android:text="따라가기"/>
 
         <LinearLayout
             android:id="@+id/summary_info"
@@ -97,10 +97,34 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_find_way_btn"
                 android:textColor="@android:color/white"
-                android:text="경로 안내"/>
+                android:text="따라가기"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:id="@+id/btn_walk_tracking"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_find_way_btn"
+                    android:textColor="@android:color/white"
+                    android:text="시작"/>
+
+                <TextView
+                    android:id="@+id/tracking"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    android:text="트래킹 중.."/>
+            </LinearLayout>
         </LinearLayout>
 
-        <com.sample.walkcourse.ui.home.FragmentViewPager
+        <com.sample.walkcourse.base.FragmentViewPager
             android:id="@+id/fragment_pager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
