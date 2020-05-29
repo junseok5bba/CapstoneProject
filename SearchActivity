@@ -2,20 +2,51 @@ package com.sample.walkcourse.search
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sample.walkcourse.R
+import com.sample.walkcourse.util.TextBottomSheet
 import com.sample.walkcourse.extension.getJsonAsset
 import com.sample.walkcourse.ui.DetailActivity
 import com.sample.walkcourse.ui.home.data.CourseData
 import kotlinx.android.synthetic.main.activity_search.*
 
+
+/**
+ *   검색 화면입니다.
+ *   정렬 및 필터 기능을 포함하고있습니다.
+ *   SortedBy, Filter
+ */
+
 class SearchActivity : AppCompatActivity() {
+    private var focusPosition = 0
+
+    lateinit var listView: RecyclerView
+
+    private var currentSearchStr: String = ""
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
+
+        search_actionbar_back.setOnClickListener {
+            finish()
+        }
+
+        //setSupportActionBar(search_actionbar)
 
         val click = { course: CourseData ->
             startActivity(Intent(this, DetailActivity::class.java).apply {
@@ -27,10 +58,25 @@ class SearchActivity : AppCompatActivity() {
         val type = object : TypeToken<ArrayList<CourseData>>(){}.type
         val course = Gson().fromJson<ArrayList<CourseData>>(jsonString, type)
 
-        val searchAdapter = SearchAdapter(click).apply {
-            //submitList(course)
+        listView = search_list_view
+
+        filter.setOnClickListener {
+            TextBottomSheet.Builder(it.context)
+                .texts(listOf("코스길이순", "소요시간순", "난이도순"))
+                .keys(listOf("course", "time", "level"))
+                .textFontSize(16.0f)
+                .focus(focusPosition)
+                .focusColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                .listener(object: TextBottomSheet.OnTextClickListener {
+                    override fun onClickItem(index: Int, text: String, key: String) {
+                        focusPosition = index
+                        setCourse(key)
+                        filter.text = text
+                    }
+                })
+                .build()
+                .show()
         }
-        search_list_view.adapter = searchAdapter
 
         input_search.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -40,11 +86,85 @@ class SearchActivity : AppCompatActivity() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 newText?.let { str ->
                     if (str.isNotEmpty()) {
-                        searchAdapter.submitList(course.filter { it.course_name.contains(str) })
+                        currentSearchStr = str
+
+                        when(focusPosition) {
+                            0 -> {
+                                listView.adapter = SearchAdapter(str, click).apply {
+                                    submitList(course.filter {
+                                        (it.walk_name + " " +it.course_name).contains(str)
+                                    }.sortedBy { it.distance_km })
+                                }
+                            }
+
+                            1 -> {
+                                listView.adapter = SearchAdapter(str, click).apply {
+                                    submitList(course.filter {
+                                        (it.walk_name + " " +it.time).contains(str)
+                                    })
+                                }
+                            }
+
+                            2 -> {
+                                listView.adapter = SearchAdapter(str, click).apply {
+                                    submitList(course.filter {
+                                        (it.walk_name + " " +it.level).contains(str)
+                                    })
+                                }
+                            }
+                        }
+
+                    } else {
+                        currentSearchStr = str
+                        listView.adapter = SearchAdapter(str, click).apply {
+                            submitList(listOf())
+                        }
                     }
                 }
                 return true
             }
         })
+    }
+
+    private fun setCourse(filter: String) {
+        val click = { course: CourseData ->
+            startActivity(Intent(this, DetailActivity::class.java).apply {
+                putExtra("course", course)
+            })
+        }
+        val jsonString = this.getJsonAsset("sample.json")
+
+        val type = object :TypeToken<ArrayList<CourseData>>(){}.type
+        var course = Gson().fromJson<ArrayList<CourseData>>(jsonString, type)
+
+        var courseResult = listOf<CourseData>()
+        when(filter) {
+            "distance" -> {
+                courseResult = course.sortedBy { it.distance_km }.filter {
+                    (it.walk_name + " " +it.course_name).contains(currentSearchStr)
+                }
+            }
+
+            "course" -> {
+                courseResult = course.sortedBy { it.distance_km }.filter {
+                    (it.walk_name + " " +it.course_name).contains(currentSearchStr)
+                }
+            }
+
+            "time" -> {
+                courseResult = course.sortedBy { it.time }.filter {
+                    (it.walk_name + " " +it.course_name).contains(currentSearchStr)
+                }
+            }
+
+            "level" -> {
+                courseResult = course.sortedBy { it.level }.filter {
+                    (it.walk_name + " " +it.course_name).contains(currentSearchStr)
+                }
+            }
+        }
+        listView.adapter = SearchAdapter(currentSearchStr, click).apply {
+            submitList(courseResult)
+        }
     }
 }
