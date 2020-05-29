@@ -1,0 +1,17 @@
+package com.solar.solarjetpack.room.entity.product
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+/**
+ *  앱 DB Table 클래스
+ */
+@Entity(tableName = "walks")
+data class Walk(
+    @PrimaryKey
+    val id: Int,
+    val name: String,
+    val description: String,
+    val time: String,
+    val walk_count: Int
+)
