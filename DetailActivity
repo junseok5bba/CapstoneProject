@@ -1,51 +1,175 @@
 package com.sample.walkcourse.ui
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Color
+import android.hardware.SensorManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentActivity
+import android.view.View
+import androidx.databinding.ViewDataBinding
+import com.bumptech.glide.Glide
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.gson.Gson
 import com.google.maps.android.data.kml.KmlLayer
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.TedPermission
+import com.sample.basefirebase.database.FirebaseStorageManager
+import com.sample.walkcourse.base.BaseActivity
 import com.sample.walkcourse.R
+import com.sample.walkcourse.databinding.FragmentCommentBinding
+import com.sample.walkcourse.databinding.FragmentCourseDetailBinding
+import com.sample.walkcourse.db.AppDatabase
 import com.sample.walkcourse.extension.getJsonAsset
 import com.sample.walkcourse.extension.toast
 import com.sample.walkcourse.ui.comment.Comment
 import com.sample.walkcourse.ui.comment.CommentAdapter
+import com.sample.walkcourse.base.FragmentViewPager
 import com.sample.walkcourse.ui.home.data.CourseData
+import com.sample.walkcourse.walk.WalkResultActivity
+import com.sample.walkcourse.walk.WalkSensorManager
+import com.solar.solarjetpack.room.entity.product.Walk
+import com.zhihu.matisse.Matisse
+import com.zhihu.matisse.MimeType
+import com.zhihu.matisse.engine.impl.GlideEngine
 import io.ticofab.androidgpxparser.parser.GPXParser
 import io.ticofab.androidgpxparser.parser.domain.Gpx
 import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.fragment_comment.*
 import org.xmlpull.v1.XmlPullParserException
 import java.io.ByteArrayInputStream
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 
-class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
+/**
+ *   코스 디테일 화면입니다.
+ */
+
+class DetailActivity : BaseActivity(), OnMapReadyCallback {
+
     private val course  by lazy { intent.getParcelableExtra("course") as CourseData }
+    private var latitude = 126.9854131
+    private var longitude = 37.5302862
+
+    private var walkCount = 0
+    private var walkStartTime: Long = 0L
+    private var uri: Uri? = null
+    private lateinit var walkSensorManager: WalkSensorManager
+
+    /**
+     *   onViewCreated
+     *   TabLayout, FragmentViewPager를 구현해놓은 함수로
+     *   onViewCreated는 각 Fragment가 onViewCreated호출될때 리스너를 통해 자신의 바인딩 객체를 전달합니다.
+     *   전달받은 객체를 기반으로 뷰작업을 합니다.
+     */
+    private fun initViewPager() {
+        tab_layout.let {
+            it.setupWithViewPager(fragment_pager)
+        }
+
+        // FragmentViewPager
+        fragment_pager.let {
+            it.arrowScroll(View.FOCUS_RIGHT)
+            it.listener = object: FragmentViewPager.OnFragmentListener {
+
+                override fun onViewCreated(binding: ViewDataBinding, savedInstanceState: Bundle?) {
+                    Log.d("onViewCreated", "onViewCreated")
+                    when(binding) {
+                        is FragmentCourseDetailBinding -> bindingCourDetail(binding, savedInstanceState)
+                        is FragmentCommentBinding -> bindingComment(binding)
+                    }
+                }
+            }
+            it.init(supportFragmentManager, listOf(
+                it.getFragment("코스개요", R.layout.fragment_course_detail, it.listener),
+                it.getFragment("별점 및 후기", R.layout.fragment_comment, it.listener)
+            ))
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment!!.getMapAsync(this)
+
+        val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        walkSensorManager = WalkSensorManager(sensorManager) { count ->
+            Log.d("DetailActivity", count.toString())
+            walkCount += count.toInt()
+        }
+
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            TedPermission.with(this)
+                .setPermissionListener(object: PermissionListener {
+                    override fun onPermissionGranted() {
+
+                    }
+                    override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+                        toast("권한을 허용해주세요")
+                        finish()
+                    }
+                })
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.ACTIVITY_RECOGNITION)
+                .check()
+        }
+
+
+        /**
+         *   시작 하면 SensorManager를 동작시킵니다.(lifecycle.addObserver(walkSensorManager))
+         *   종료를 누르면 walkCount 멤버변수를 WalkResultActivity에 값을 전달하고
+         *   AppDatabase.getInstance(this).walkDao().insert(walk)를 실행하여 walk 클래스를 만들어서 이름, 걷은 횟수를 로컬 DB에 저장합니다.
+         */
+
+        btn_walk_tracking.setOnClickListener {
+            if (btn_walk_tracking.text.toString() == "시작") {
+                tracking.visibility = View.VISIBLE
+                walkStartTime = System.currentTimeMillis()
+                walkCount = 0
+                lifecycle.addObserver(walkSensorManager)
+
+                btn_walk_tracking.text = "종료"
+            } else {
+                tracking.visibility = View.GONE
+                btn_walk_tracking.text = "시작"
+                lifecycle.removeObserver(walkSensorManager)
+
+                val time = System.currentTimeMillis() - walkStartTime
+                val min = TimeUnit.MILLISECONDS.toMinutes(time)
+                val second = TimeUnit.MILLISECONDS.toSeconds(time)
+
+                val timeStr = min.toString() + "분 " + second.toString() + "초"
+
+                Thread {
+                    val walk = Walk(course.id, course.course_name + " " + course.walk_name, "", timeStr, walkCount)
+                    AppDatabase.getInstance(this).walkDao().insert(walk)
+                    startActivity(Intent(this, WalkResultActivity::class.java).apply {
+                        putExtra("id", course.id)
+                    })
+                }.start()
+            }
+        }
 
         bind_way.setOnClickListener {
-            val latitude = "126.9854131"
-            val longitude = "37.5302862"
-
+            Log.d("latitude", latitude.toString())
+            Log.d("longitude", longitude.toString())
             val uri = Uri.parse("tmap://route?goalx=$latitude&goaly=$longitude")
             val intent = Intent(Intent.ACTION_VIEW, uri)
             startActivity(intent)
@@ -53,7 +177,7 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
         detail_title.text = course.walk_name + " " + course.course_name
         length_distance.text = course.distance_km.toString() + "km"
-        time.text = course.time
+        time.text = course.time.toString() + "분"
         level.text = when(course.level) {
             1 -> "쉬움"
             2 -> "보통"
@@ -61,107 +185,25 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
             else -> ""
         }
 
-        detail_course_desc.text = course.course_desc
-        detail_toilit.text = course.toilet
-        detail_water.text = course.water
-        detail_mart.text = course.mart
-        comment_confirm.setOnClickListener {
-            val text = input_text.text.toString()
-            if (FirebaseAuth.getInstance().currentUser != null) {
-                if (text.isEmpty()) {
-                    toast("댓글을 입력해 주세요")
-                } else {
-                    FirebaseDatabase.getInstance().getReference("Comment").push().setValue(Comment(
-                        0, FirebaseAuth.getInstance().currentUser?.displayName!!, text, "2020/05/21"
-                    )).addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            toast("댓글 쓰기 성공")
-                        }
-                    }
-                }
-            } else {
-                toast("로그인을 해주세요")
-            }
-        }
+        initViewPager()
+    }
 
-        FirebaseDatabase.getInstance().getReference("Comment").child(course.id.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onCancelled(p0: DatabaseError) { }
-            override fun onDataChange(p0: DataSnapshot) {
-                val list = arrayListOf<Comment>()
-                p0.children.forEach {
-                    val comment = it.getValue(Comment::class.java)
-                    comment?.let { list.add(it) }
-                }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 0) {
+            if (resultCode == Activity.RESULT_OK) {
+                val images = Matisse.obtainResult(data)
 
-                comment_list_view.adapter = CommentAdapter().apply {
-                    submitList(list)
-                }
-            }
-        })
-}
-
-private fun gpx(name: String, googleMap: GoogleMap) {
-        val mParser = GPXParser() // con    sider injection
-        var parsedGpx: Gpx? = null
-
-        val input  = getJsonAsset(name)
-        val inputStream = ByteArrayInputStream(input.toByteArray(Charsets.UTF_8))
-
-        try {
-            parsedGpx = mParser.parse(inputStream)
-        } catch (e: IOException) { // do something with this exception
-            e.printStackTrace()
-        } catch (e: XmlPullParserException) {
-            e.printStackTrace()
-        }
-        if (parsedGpx == null) { // error parsing track
-        } else {
-            var swit = false
-            parsedGpx?.let { gpx ->
-                gpx.routes.forEach {
-                    //Log.d("DetailActivity" + it.)
-                }
-
-                gpx.tracks.forEach {
-
-
-                    it.trackSegments.forEach {
-                        val bound = arrayListOf<LatLngBounds>()
-                        val builder = LatLngBounds.builder()
-
-                        it.trackPoints.forEachIndexed { index, trackPoint ->
-                            if (index == 0) {
-                                googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(trackPoint.latitude, trackPoint.longitude)))
-                            }
-
-                            builder.include(LatLng(trackPoint.latitude, trackPoint.longitude))
-
-                            if (index != 0) {
-                                val previous = it.trackPoints[index-1]
-                                val line: Polyline = googleMap.addPolyline(
-                                    PolylineOptions()
-                                        .add(LatLng(previous.latitude, previous.longitude), LatLng(trackPoint.latitude, trackPoint.longitude))
-                                        .width(5f)
-                                        .color(Color.RED)
-                                )
-                            }
-
-                            bound.add(builder.build())
-                            Log.d("DetailActivity", trackPoint.latitude.toString())
-                            Log.d("DetailActivity", trackPoint.longitude.toString())
-                        }
-
-                        if (bound.isNotEmpty()) {
-                            if (!swit) {
-                                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 50))
-                                swit = true
-                            }
-                        }
-                    }
+                if (images.isNotEmpty()) {
+                    this.uri = images[0]
+                    Glide.with(comment_img)
+                        .load(images[0])
+                        .into(comment_img)
                 }
             }
         }
     }
+
 
     private fun kml(name: String, googleMap: GoogleMap) {
 
