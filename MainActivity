@@ -16,9 +16,12 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.google.firebase.auth.FirebaseAuth
+import com.sample.basefirebase.FirebaseLoginActivity
+import com.sample.walkcourse.extension.toast
 import com.sample.walkcourse.search.SearchActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : FirebaseLoginActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
@@ -43,7 +46,22 @@ class MainActivity : AppCompatActivity() {
         val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawerLayout.addDrawerListener(toggle)
 
+
         navView.setNavigationItemSelectedListener {
+            when(it.itemId) {
+                R.id.nav_login -> {
+                    resultListener = { result->
+                        if (result == LoginResult.SUCCESS) {
+                            FirebaseAuth.getInstance().currentUser?.let {user ->
+                                val menu = navView.menu.findItem(R.id.nav_login)
+                                menu.setTitle(user.displayName + "님 환영합니다")
+                            }
+                            toast("로그인에 성공했습니다")
+                        }
+                    }
+                    googleLogin()
+                }
+            }
             return@setNavigationItemSelectedListener true
         }
 
@@ -62,14 +80,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_settings) {
-            startActivity(Intent(this, SearchActivity::class.java))
+        when(item.itemId) {
+            R.id.action_settings -> startActivity(Intent(this, SearchActivity::class.java))
         }
+
+
         return super.onOptionsItemSelected(item)
     }
 
-    /*override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }*/
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 10) {
+
+        }
+    }
 }
