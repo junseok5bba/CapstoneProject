@@ -1,24 +1,41 @@
 package com.sample.walkcourse.search
 
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import androidx.databinding.ViewDataBinding
 import com.sample.walkcourse.R
 import com.sample.walkcourse.databinding.ItemWalkBinding
-import com.sample.walkcourse.ui.home.BaseRecyclerViewAdapter
+import com.sample.walkcourse.base.BaseRecyclerViewAdapter
 import com.sample.walkcourse.ui.home.data.CourseData
 
-class SearchAdapter(val click: (course: CourseData) -> Unit) : BaseRecyclerViewAdapter<CourseData, ItemWalkBinding>() {
+class SearchAdapter(
+    val query: String,
+    val click: (course: CourseData) -> Unit) : BaseRecyclerViewAdapter<CourseData, ItemWalkBinding>() {
     override val layoutRes: Int = R.layout.item_walk
     override fun bindingEvent(): (binding: ViewDataBinding) -> Unit = {}
 
     override fun bind(binding: ItemWalkBinding, item: CourseData, position: Int) {
         with(binding) {
             //title.text = item.title
+            val str = item.walk_name + " " + item.course_name
+            val startIndex = str.indexOf(query)
+
+            val sp = SpannableStringBuilder(str)
+            sp.setSpan(ForegroundColorSpan(Color.BLUE), startIndex, startIndex + query.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             root.setOnClickListener { click(item) }
-            title.text = item.walk_name + " " + item.course_name
+
+            title.text = sp
             locale.text = item.locale_main
             lengthDistance.text = item.distance_km.toString() + "km"
-            time.text = item.time
-            level.text = item.level
+            time.text = item.time.toString() + "분"
+            level.text = when(item.level) {
+                1 -> "쉬움"
+                2 -> "보통"
+                3 -> "어려움"
+                else -> ""
+            }
         }
     }
 }
