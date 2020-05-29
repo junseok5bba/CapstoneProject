@@ -1,0 +1,21 @@
+package com.sample.walkcourse.walk
+
+import android.os.Bundle
+import com.sample.walkcourse.base.BaseActivity
+import com.sample.walkcourse.R
+import com.sample.walkcourse.db.AppDatabase
+import kotlinx.android.synthetic.main.activity_walk.*
+
+class WalkResultActivity : BaseActivity() {
+    private val id: Int by lazy { intent.getIntExtra("id", 0) }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_walk)
+        Thread {
+            val walks = AppDatabase.getInstance(this@WalkResultActivity).walkDao().getWalksById(id)
+            walk_result_list_view.adapter = WalkResultAdapter().apply {
+                submitList(walks)
+            }
+        }.start()
+    }
+}
