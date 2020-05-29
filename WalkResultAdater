@@ -1,0 +1,16 @@
+package com.sample.walkcourse.walk
+
+import androidx.databinding.ViewDataBinding
+import com.sample.walkcourse.R
+import com.sample.walkcourse.databinding.ItemWalkResultBinding
+import com.sample.walkcourse.base.BaseRecyclerViewAdapter
+import com.solar.solarjetpack.room.entity.product.Walk
+
+class WalkResultAdapter : BaseRecyclerViewAdapter<Walk, ItemWalkResultBinding>() {
+    override val layoutRes: Int = R.layout.item_walk_result
+    override fun bindingEvent(): (binding: ViewDataBinding) -> Unit = {}
+    override fun bind(binding: ItemWalkResultBinding, item: Walk, position: Int) {
+        binding.walk = item
+        binding.walkCalorie.text = (item.walk_count.toFloat() * 0.0523f).toString()
+    }
+}
