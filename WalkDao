@@ -1,0 +1,39 @@
+package com.solar.solarjetpack.room.entity.product
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import io.reactivex.Flowable
+
+/**
+ *  앱 DB의 쿼리문 관리 interface
+ */
+
+@Dao
+interface WalkDao {
+    /**
+     * Get a product by id.
+
+     * @return the product from the table with a specific id.
+     */
+    @Query("SELECT * FROM walks WHERE id = :id")
+    fun getWalkById(id: Int): Flowable<Walk>
+
+    /**
+     * Insert a product in the database. If the product already exists, replace it.
+
+     * @param product the product to be inserted.
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(walk: Walk)
+
+    @Query("SELECT * FROM walks WHERE id = :id")
+    fun getWalksById(id: Int): List<Walk>
+
+    /**
+     * Delete all products.
+     */
+    @Query("DELETE FROM walks")
+    fun deleteAll()
+}
