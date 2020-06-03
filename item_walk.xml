@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
+<layout
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -21,10 +22,9 @@
                 android:id="@+id/around_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="반경 10.0km"
+                android:text=""
                 android:gravity="center"
-                android:drawableStart="@drawable/ic_place_white_24dp"
-                android:drawableTint="@color/colorPrimary"
+                android:drawableStart="@drawable/ic_poi"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
 
@@ -56,8 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawablePadding="4dp"
-                android:drawableStart="@drawable/ic_keyboard_tab_white_16dp"
-                android:drawableTint="@color/colorPrimary"
+                android:drawableStart="@drawable/ic_distance"
                 android:layout_marginTop="6dp"
                 android:textColor="#cc000000"
                 android:text="110.0km"
@@ -70,8 +69,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:drawablePadding="4dp"
-                android:drawableStart="@drawable/ic_access_time_white_10dp"
-                android:drawableTint="@color/colorPrimary"
+                android:drawableStart="@drawable/ic_time"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="6dp"
                 android:textColor="#cc000000"
