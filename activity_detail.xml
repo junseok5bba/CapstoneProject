@@ -25,8 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="4dp"
-            android:drawableStart="@drawable/ic_keyboard_tab_white_16dp"
-            android:drawableTint="@color/colorPrimary"
+            android:drawableStart="@drawable/ic_distance"
             android:layout_marginTop="6dp"
             android:textColor="#cc000000"
             android:text="110.0km"
@@ -39,8 +38,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:drawablePadding="4dp"
-            android:drawableStart="@drawable/ic_access_time_white_10dp"
-            android:drawableTint="@color/colorPrimary"
+            android:drawableStart="@drawable/ic_time"
             android:layout_marginStart="10dp"
             android:layout_marginTop="6dp"
             android:textColor="#cc000000"
@@ -66,7 +64,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/detail_title"
-            android:text="경로 안내"/>
+            android:text="따라가기"/>
 
         <LinearLayout
             android:id="@+id/summary_info"
@@ -97,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_find_way_btn"
                 android:textColor="@android:color/white"
-                android:text="경로 안내"/>
+                android:text="따라가기"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
