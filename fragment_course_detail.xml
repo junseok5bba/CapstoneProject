@@ -37,8 +37,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawablePadding="4dp"
-                    android:drawableStart="@drawable/ic_trending_up_black_24dp"
-                    android:drawableTint="@color/colorPrimary"
+                    android:drawableStart="@drawable/ic_course"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
                     android:text="코스경로" />
@@ -56,8 +55,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:drawablePadding="4dp"
-                    android:drawableStart="@drawable/ic_wc_black_24dp"
-                    android:drawableTint="@color/colorPrimary"
+                    android:drawableStart="@drawable/ic_restroom"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
                     android:text="화장실" />
@@ -75,8 +73,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:drawablePadding="4dp"
-                    android:drawableStart="@drawable/ic_invert_colors_black_24dp"
-                    android:drawableTint="@color/colorPrimary"
+                    android:drawableStart="@drawable/ic_water"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
                     android:text="식수" />
@@ -94,8 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:drawablePadding="4dp"
-                    android:drawableStart="@drawable/ic_shopping_cart_black_24dp"
-                    android:drawableTint="@color/colorPrimary"
+                    android:drawableStart="@drawable/ic_cart"
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
                     android:text="매점" />
