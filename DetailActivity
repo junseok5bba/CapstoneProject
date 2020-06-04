@@ -217,6 +217,16 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
 
         Log.d("hasPlaceMarks", layer.hasPlacemarks().toString())
     }
+    private fun bindingCourDetail(binding: FragmentCourseDetailBinding, savedInstanceState: Bundle?) {
+        binding.detailCourseDesc.text = course.course_desc
+        binding.detailToilit.text = course.toilet
+        binding.detailWater.text = course.water
+        binding.detailWater.text = course.mart
+        savedInstanceState?.let {
+            binding.map.onCreate(it)
+        }
+        binding.map.getMapAsync(this@DetailActivity)
+    }
      private fun bindingComment(binding: FragmentCommentBinding) {
         var checkedRating = 5.0f
         binding.radioGroup.setOnCheckedChangeListener { p0, p1 ->
