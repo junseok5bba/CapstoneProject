@@ -1,0 +1,144 @@
+package com.sample.walkcourse.databinding;
+import com.sample.walkcourse.R;
+import com.sample.walkcourse.BR;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import android.view.View;
+@SuppressWarnings("unchecked")
+public class ItemCommentBindingImpl extends ItemCommentBinding  {
+
+    @Nullable
+    private static final androidx.databinding.ViewDataBinding.IncludedLayouts sIncludes;
+    @Nullable
+    private static final android.util.SparseIntArray sViewsWithIds;
+    static {
+        sIncludes = null;
+        sViewsWithIds = new android.util.SparseIntArray();
+        sViewsWithIds.put(R.id.comment_img, 5);
+    }
+    // views
+    @NonNull
+    private final android.widget.LinearLayout mboundView0;
+    @NonNull
+    private final android.widget.RatingBar mboundView3;
+    // variables
+    // values
+    // listeners
+    // Inverse Binding Event Handlers
+
+    public ItemCommentBindingImpl(@Nullable androidx.databinding.DataBindingComponent bindingComponent, @NonNull View root) {
+        this(bindingComponent, root, mapBindings(bindingComponent, root, 6, sIncludes, sViewsWithIds));
+    }
+    private ItemCommentBindingImpl(androidx.databinding.DataBindingComponent bindingComponent, View root, Object[] bindings) {
+        super(bindingComponent, root, 0
+            , (android.widget.TextView) bindings[2]
+            , (android.widget.ImageView) bindings[5]
+            , (android.widget.TextView) bindings[1]
+            , (android.widget.TextView) bindings[4]
+            );
+        this.commentDate.setTag(null);
+        this.commentName.setTag(null);
+        this.commentText.setTag(null);
+        this.mboundView0 = (android.widget.LinearLayout) bindings[0];
+        this.mboundView0.setTag(null);
+        this.mboundView3 = (android.widget.RatingBar) bindings[3];
+        this.mboundView3.setTag(null);
+        setRootTag(root);
+        // listeners
+        invalidateAll();
+    }
+
+    @Override
+    public void invalidateAll() {
+        synchronized(this) {
+                mDirtyFlags = 0x2L;
+        }
+        requestRebind();
+    }
+
+    @Override
+    public boolean hasPendingBindings() {
+        synchronized(this) {
+            if (mDirtyFlags != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean setVariable(int variableId, @Nullable Object variable)  {
+        boolean variableSet = true;
+        if (BR.comment == variableId) {
+            setComment((com.sample.walkcourse.ui.comment.Comment) variable);
+        }
+        else {
+            variableSet = false;
+        }
+            return variableSet;
+    }
+
+    public void setComment(@Nullable com.sample.walkcourse.ui.comment.Comment Comment) {
+        this.mComment = Comment;
+        synchronized(this) {
+            mDirtyFlags |= 0x1L;
+        }
+        notifyPropertyChanged(BR.comment);
+        super.requestRebind();
+    }
+
+    @Override
+    protected boolean onFieldChange(int localFieldId, Object object, int fieldId) {
+        switch (localFieldId) {
+        }
+        return false;
+    }
+
+    @Override
+    protected void executeBindings() {
+        long dirtyFlags = 0;
+        synchronized(this) {
+            dirtyFlags = mDirtyFlags;
+            mDirtyFlags = 0;
+        }
+        java.lang.String CommentText1 = null;
+        com.sample.walkcourse.ui.comment.Comment comment = mComment;
+        java.lang.String CommentName1 = null;
+        java.lang.String CommentDate1 = null;
+        float commentRate = 0f;
+
+        if ((dirtyFlags & 0x3L) != 0) {
+
+
+
+                if (comment != null) {
+                    // read comment.text
+                    CommentText1 = comment.getText();
+                    // read comment.name
+                    CommentName1 = comment.getName();
+                    // read comment.date
+                    CommentDate1 = comment.getDate();
+                    // read comment.rate
+                    commentRate = comment.getRate();
+                }
+        }
+        // batch finished
+        if ((dirtyFlags & 0x3L) != 0) {
+            // api target 1
+
+            androidx.databinding.adapters.TextViewBindingAdapter.setText(this.commentDate, CommentDate1);
+            androidx.databinding.adapters.TextViewBindingAdapter.setText(this.commentName, CommentName1);
+            androidx.databinding.adapters.TextViewBindingAdapter.setText(this.commentText, CommentText1);
+            androidx.databinding.adapters.RatingBarBindingAdapter.setRating(this.mboundView3, commentRate);
+        }
+    }
+    // Listener Stub Implementations
+    // callback impls
+    // dirty flag
+    private  long mDirtyFlags = 0xffffffffffffffffL;
+    /* flag mapping
+        flag 0 (0x1L): comment
+        flag 1 (0x2L): null
+    flag mapping end*/
+    //end
+}
