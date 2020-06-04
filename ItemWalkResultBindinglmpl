@@ -1,0 +1,145 @@
+package com.sample.walkcourse.databinding;
+import com.sample.walkcourse.R;
+import com.sample.walkcourse.BR;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import android.view.View;
+@SuppressWarnings("unchecked")
+public class ItemWalkResultBindingImpl extends ItemWalkResultBinding  {
+
+    @Nullable
+    private static final androidx.databinding.ViewDataBinding.IncludedLayouts sIncludes;
+    @Nullable
+    private static final android.util.SparseIntArray sViewsWithIds;
+    static {
+        sIncludes = null;
+        sViewsWithIds = new android.util.SparseIntArray();
+        sViewsWithIds.put(R.id.walk_calorie, 4);
+    }
+    // views
+    @NonNull
+    private final android.widget.LinearLayout mboundView0;
+    @NonNull
+    private final android.widget.TextView mboundView2;
+    @NonNull
+    private final android.widget.TextView mboundView3;
+    // variables
+    // values
+    // listeners
+    // Inverse Binding Event Handlers
+
+    public ItemWalkResultBindingImpl(@Nullable androidx.databinding.DataBindingComponent bindingComponent, @NonNull View root) {
+        this(bindingComponent, root, mapBindings(bindingComponent, root, 5, sIncludes, sViewsWithIds));
+    }
+    private ItemWalkResultBindingImpl(androidx.databinding.DataBindingComponent bindingComponent, View root, Object[] bindings) {
+        super(bindingComponent, root, 0
+            , (android.widget.TextView) bindings[1]
+            , (android.widget.TextView) bindings[4]
+            );
+        this.courseName.setTag(null);
+        this.mboundView0 = (android.widget.LinearLayout) bindings[0];
+        this.mboundView0.setTag(null);
+        this.mboundView2 = (android.widget.TextView) bindings[2];
+        this.mboundView2.setTag(null);
+        this.mboundView3 = (android.widget.TextView) bindings[3];
+        this.mboundView3.setTag(null);
+        setRootTag(root);
+        // listeners
+        invalidateAll();
+    }
+
+    @Override
+    public void invalidateAll() {
+        synchronized(this) {
+                mDirtyFlags = 0x2L;
+        }
+        requestRebind();
+    }
+
+    @Override
+    public boolean hasPendingBindings() {
+        synchronized(this) {
+            if (mDirtyFlags != 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean setVariable(int variableId, @Nullable Object variable)  {
+        boolean variableSet = true;
+        if (BR.walk == variableId) {
+            setWalk((com.solar.solarjetpack.room.entity.product.Walk) variable);
+        }
+        else {
+            variableSet = false;
+        }
+            return variableSet;
+    }
+
+    public void setWalk(@Nullable com.solar.solarjetpack.room.entity.product.Walk Walk) {
+        this.mWalk = Walk;
+        synchronized(this) {
+            mDirtyFlags |= 0x1L;
+        }
+        notifyPropertyChanged(BR.walk);
+        super.requestRebind();
+    }
+
+    @Override
+    protected boolean onFieldChange(int localFieldId, Object object, int fieldId) {
+        switch (localFieldId) {
+        }
+        return false;
+    }
+
+    @Override
+    protected void executeBindings() {
+        long dirtyFlags = 0;
+        synchronized(this) {
+            dirtyFlags = mDirtyFlags;
+            mDirtyFlags = 0;
+        }
+        int walkWalkCount = 0;
+        java.lang.String walkName = null;
+        java.lang.String walkTime = null;
+        com.solar.solarjetpack.room.entity.product.Walk walk = mWalk;
+        java.lang.String mboundView2AndroidStringMergeWalkWalkWalkCount = null;
+
+        if ((dirtyFlags & 0x3L) != 0) {
+
+
+
+                if (walk != null) {
+                    // read walk.walk_count
+                    walkWalkCount = walk.getWalk_count();
+                    // read walk.name
+                    walkName = walk.getName();
+                    // read walk.time
+                    walkTime = walk.getTime();
+                }
+
+
+                // read @android:string/merge_walk
+                mboundView2AndroidStringMergeWalkWalkWalkCount = mboundView2.getResources().getString(R.string.merge_walk, walkWalkCount);
+        }
+        // batch finished
+        if ((dirtyFlags & 0x3L) != 0) {
+            // api target 1
+
+            androidx.databinding.adapters.TextViewBindingAdapter.setText(this.courseName, walkName);
+            androidx.databinding.adapters.TextViewBindingAdapter.setText(this.mboundView2, mboundView2AndroidStringMergeWalkWalkWalkCount);
+            androidx.databinding.adapters.TextViewBindingAdapter.setText(this.mboundView3, walkTime);
+        }
+    }
+    // Listener Stub Implementations
+    // callback impls
+    // dirty flag
+    private  long mDirtyFlags = 0xffffffffffffffffL;
+    /* flag mapping
+        flag 0 (0x1L): walk
+        flag 1 (0x2L): null
+    flag mapping end*/
+    //end
+}
