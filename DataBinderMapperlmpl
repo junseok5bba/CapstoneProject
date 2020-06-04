@@ -7,10 +7,15 @@ import androidx.databinding.DataBinderMapper;
 import androidx.databinding.DataBindingComponent;
 import androidx.databinding.ViewDataBinding;
 import com.sample.walkcourse.databinding.ActivityDetailBindingImpl;
+import com.sample.walkcourse.databinding.ActivityWalkBindingImpl;
 import com.sample.walkcourse.databinding.FragmentBikeBindingImpl;
+import com.sample.walkcourse.databinding.FragmentCommentBindingImpl;
+import com.sample.walkcourse.databinding.FragmentCourseDetailBindingImpl;
 import com.sample.walkcourse.databinding.FragmentHomeBindingImpl;
 import com.sample.walkcourse.databinding.FragmentWalkBindingImpl;
+import com.sample.walkcourse.databinding.ItemCommentBindingImpl;
 import com.sample.walkcourse.databinding.ItemWalkBindingImpl;
+import com.sample.walkcourse.databinding.ItemWalkResultBindingImpl;
 import java.lang.IllegalArgumentException;
 import java.lang.Integer;
 import java.lang.Object;
@@ -24,22 +29,37 @@ import java.util.List;
 public class DataBinderMapperImpl extends DataBinderMapper {
   private static final int LAYOUT_ACTIVITYDETAIL = 1;
 
-  private static final int LAYOUT_FRAGMENTBIKE = 2;
+  private static final int LAYOUT_ACTIVITYWALK = 2;
 
-  private static final int LAYOUT_FRAGMENTHOME = 3;
+  private static final int LAYOUT_FRAGMENTBIKE = 3;
 
-  private static final int LAYOUT_FRAGMENTWALK = 4;
+  private static final int LAYOUT_FRAGMENTCOMMENT = 4;
 
-  private static final int LAYOUT_ITEMWALK = 5;
+  private static final int LAYOUT_FRAGMENTCOURSEDETAIL = 5;
 
-  private static final SparseIntArray INTERNAL_LAYOUT_ID_LOOKUP = new SparseIntArray(5);
+  private static final int LAYOUT_FRAGMENTHOME = 6;
+
+  private static final int LAYOUT_FRAGMENTWALK = 7;
+
+  private static final int LAYOUT_ITEMCOMMENT = 8;
+
+  private static final int LAYOUT_ITEMWALK = 9;
+
+  private static final int LAYOUT_ITEMWALKRESULT = 10;
+
+  private static final SparseIntArray INTERNAL_LAYOUT_ID_LOOKUP = new SparseIntArray(10);
 
   static {
     INTERNAL_LAYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.activity_detail, LAYOUT_ACTIVITYDETAIL);
+    INTERNAL_LAYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.activity_walk, LAYOUT_ACTIVITYWALK);
     INTERNAL_LAYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.fragment_bike, LAYOUT_FRAGMENTBIKE);
+    INTERNAL_LAYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.fragment_comment, LAYOUT_FRAGMENTCOMMENT);
+    INTERNAL_LAYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.fragment_course_detail, LAYOUT_FRAGMENTCOURSEDETAIL);
     INTERNAL_LAYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.fragment_home, LAYOUT_FRAGMENTHOME);
-    INTERNAL_LAaYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.fragment_walk, LAYOUT_FRAGMENTWALK);
+    INTERNAL_LAYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.fragment_walk, LAYOUT_FRAGMENTWALK);
+    INTERNAL_LAYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.item_comment, LAYOUT_ITEMCOMMENT);
     INTERNAL_LAYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.item_walk, LAYOUT_ITEMWALK);
+    INTERNAL_LAYOUT_ID_LOOKUP.put(com.sample.walkcourse.R.layout.item_walk_result, LAYOUT_ITEMWALKRESULT);
   }
 
   @Override
@@ -57,11 +77,29 @@ public class DataBinderMapperImpl extends DataBinderMapper {
           }
           throw new IllegalArgumentException("The tag for activity_detail is invalid. Received: " + tag);
         }
+        case  LAYOUT_ACTIVITYWALK: {
+          if ("layout/activity_walk_0".equals(tag)) {
+            return new ActivityWalkBindingImpl(component, view);
+          }
+          throw new IllegalArgumentException("The tag for activity_walk is invalid. Received: " + tag);
+        }
         case  LAYOUT_FRAGMENTBIKE: {
           if ("layout/fragment_bike_0".equals(tag)) {
             return new FragmentBikeBindingImpl(component, view);
           }
           throw new IllegalArgumentException("The tag for fragment_bike is invalid. Received: " + tag);
+        }
+        case  LAYOUT_FRAGMENTCOMMENT: {
+          if ("layout/fragment_comment_0".equals(tag)) {
+            return new FragmentCommentBindingImpl(component, view);
+          }
+          throw new IllegalArgumentException("The tag for fragment_comment is invalid. Received: " + tag);
+        }
+        case  LAYOUT_FRAGMENTCOURSEDETAIL: {
+          if ("layout/fragment_course_detail_0".equals(tag)) {
+            return new FragmentCourseDetailBindingImpl(component, view);
+          }
+          throw new IllegalArgumentException("The tag for fragment_course_detail is invalid. Received: " + tag);
         }
         case  LAYOUT_FRAGMENTHOME: {
           if ("layout/fragment_home_0".equals(tag)) {
@@ -75,11 +113,23 @@ public class DataBinderMapperImpl extends DataBinderMapper {
           }
           throw new IllegalArgumentException("The tag for fragment_walk is invalid. Received: " + tag);
         }
+        case  LAYOUT_ITEMCOMMENT: {
+          if ("layout/item_comment_0".equals(tag)) {
+            return new ItemCommentBindingImpl(component, view);
+          }
+          throw new IllegalArgumentException("The tag for item_comment is invalid. Received: " + tag);
+        }
         case  LAYOUT_ITEMWALK: {
           if ("layout/item_walk_0".equals(tag)) {
             return new ItemWalkBindingImpl(component, view);
           }
           throw new IllegalArgumentException("The tag for item_walk is invalid. Received: " + tag);
+        }
+        case  LAYOUT_ITEMWALKRESULT: {
+          if ("layout/item_walk_result_0".equals(tag)) {
+            return new ItemWalkResultBindingImpl(component, view);
+          }
+          throw new IllegalArgumentException("The tag for item_walk_result is invalid. Received: " + tag);
         }
       }
     }
@@ -126,22 +176,29 @@ public class DataBinderMapperImpl extends DataBinderMapper {
   }
 
   private static class InnerBrLookup {
-    static final SparseArray<String> sKeys = new SparseArray<String>(1);
+    static final SparseArray<String> sKeys = new SparseArray<String>(3);
 
     static {
       sKeys.put(0, "_all");
+      sKeys.put(1, "comment");
+      sKeys.put(2, "walk");
     }
   }
 
   private static class InnerLayoutIdLookup {
-    static final HashMap<String, Integer> sKeys = new HashMap<String, Integer>(5);
+    static final HashMap<String, Integer> sKeys = new HashMap<String, Integer>(10);
 
     static {
       sKeys.put("layout/activity_detail_0", com.sample.walkcourse.R.layout.activity_detail);
+      sKeys.put("layout/activity_walk_0", com.sample.walkcourse.R.layout.activity_walk);
       sKeys.put("layout/fragment_bike_0", com.sample.walkcourse.R.layout.fragment_bike);
+      sKeys.put("layout/fragment_comment_0", com.sample.walkcourse.R.layout.fragment_comment);
+      sKeys.put("layout/fragment_course_detail_0", com.sample.walkcourse.R.layout.fragment_course_detail);
       sKeys.put("layout/fragment_home_0", com.sample.walkcourse.R.layout.fragment_home);
       sKeys.put("layout/fragment_walk_0", com.sample.walkcourse.R.layout.fragment_walk);
+      sKeys.put("layout/item_comment_0", com.sample.walkcourse.R.layout.item_comment);
       sKeys.put("layout/item_walk_0", com.sample.walkcourse.R.layout.item_walk);
+      sKeys.put("layout/item_walk_result_0", com.sample.walkcourse.R.layout.item_walk_result);
     }
   }
 }
