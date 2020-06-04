@@ -19,26 +19,37 @@ public class ActivityDetailBindingImpl extends ActivityDetailBinding  {
         sViewsWithIds.put(R.id.time, 3);
         sViewsWithIds.put(R.id.level, 4);
         sViewsWithIds.put(R.id.summary_info, 5);
-        sViewsWithIds.put(R.id.bind_way, 6);
+        sViewsWithIds.put(R.id.tab_layout, 6);
+        sViewsWithIds.put(R.id.bind_way, 7);
+        sViewsWithIds.put(R.id.btn_walk_tracking, 8);
+        sViewsWithIds.put(R.id.tracking, 9);
+        sViewsWithIds.put(R.id.fragment_pager, 10);
     }
     // views
     @NonNull
-    private final androidx.core.widget.NestedScrollView mboundView0;
-    
+    private final androidx.constraintlayout.widget.ConstraintLayout mboundView0;
+    // variables
+    // values
+    // listeners
+    // Inverse Binding Event Handlers
 
     public ActivityDetailBindingImpl(@Nullable androidx.databinding.DataBindingComponent bindingComponent, @NonNull View root) {
-        this(bindingComponent, root, mapBindings(bindingComponent, root, 7, sIncludes, sViewsWithIds));
+        this(bindingComponent, root, mapBindings(bindingComponent, root, 11, sIncludes, sViewsWithIds));
     }
     private ActivityDetailBindingImpl(androidx.databinding.DataBindingComponent bindingComponent, View root, Object[] bindings) {
         super(bindingComponent, root, 0
-            , (android.widget.TextView) bindings[6]
+            , (android.widget.TextView) bindings[7]
+            , (android.widget.TextView) bindings[8]
             , (android.widget.TextView) bindings[1]
+            , (com.sample.walkcourse.base.FragmentViewPager) bindings[10]
             , (android.widget.TextView) bindings[2]
             , (android.widget.TextView) bindings[4]
             , (android.widget.LinearLayout) bindings[5]
+            , (com.google.android.material.tabs.TabLayout) bindings[6]
             , (android.widget.TextView) bindings[3]
+            , (android.widget.TextView) bindings[9]
             );
-        this.mboundView0 = (androidx.core.widget.NestedScrollView) bindings[0];
+        this.mboundView0 = (androidx.constraintlayout.widget.ConstraintLayout) bindings[0];
         this.mboundView0.setTag(null);
         setRootTag(root);
         // listeners
