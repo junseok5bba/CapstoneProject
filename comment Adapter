@@ -1,9 +1,11 @@
 package com.sample.walkcourse.ui.comment
 
+import android.view.View
 import androidx.databinding.ViewDataBinding
+import com.bumptech.glide.Glide
 import com.sample.walkcourse.R
 import com.sample.walkcourse.databinding.ItemCommentBinding
-import com.sample.walkcourse.ui.home.BaseRecyclerViewAdapter
+import com.sample.walkcourse.base.BaseRecyclerViewAdapter
 
 class CommentAdapter : BaseRecyclerViewAdapter<Comment, ItemCommentBinding>() {
     override val layoutRes: Int = R.layout.item_comment
@@ -11,5 +13,13 @@ class CommentAdapter : BaseRecyclerViewAdapter<Comment, ItemCommentBinding>() {
 
     override fun bind(binding: ItemCommentBinding, item: Comment, position: Int) {
         binding.comment = item
+        if (item.img != "none") {
+            binding.commentImg.visibility = View.VISIBLE
+            Glide.with(binding.commentImg)
+                .load(item.img)
+                .into(binding.commentImg)
+        } else {
+            binding.commentImg.visibility = View.GONE
+        }
     }
 }
