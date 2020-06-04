@@ -48,7 +48,6 @@ class WalkSensorManager(
                 }
                 Sensor.TYPE_STEP_COUNTER -> {
                     if (event.values.isNotEmpty()){
-                        //walkCount(event.values[0])
                         Log.d("WalkSensorManager", event.values[0].toString())
                     } else {
 
