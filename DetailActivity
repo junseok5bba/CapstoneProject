@@ -239,6 +239,33 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
             }
         }
 
+        binding.commentImg.setOnClickListener {
+            TedPermission.with(this)
+                .setPermissionListener(object: PermissionListener {
+                    override fun onPermissionGranted() {
+                        Matisse.from(this@DetailActivity)
+                            .choose(MimeType.ofImage())
+                            .countable(true)
+                            .maxSelectable(1)
+                            //.addFilter(GifSizeFilter(320, 320, 5 * Filter.K * Filter.K))
+                            //.gridExpectedSize(resources.getDimensionPixelSize(R.dimen.grid_expected_size))
+                            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                            .thumbnailScale(0.85f)
+                            .imageEngine(GlideEngine())
+                            //.showPreview(false) // Default is `true
+                            .theme(R.style.Matisse_Dracula)
+                            .forResult(0)
+                    }
+
+                    override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
+
+                    }
+
+                })
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .check()
+        }
         binding.commentConfirm.setOnClickListener {
             val text = binding.inputText.text.toString()
             if (FirebaseAuth.getInstance().currentUser != null) {
@@ -252,17 +279,36 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
                         time = System.currentTimeMillis()
                     })
 
-                    FirebaseDatabase.getInstance().getReference("Comment").child(course.id.toString()).push().setValue(Comment(
-                        FirebaseAuth.getInstance().uid?:"", FirebaseAuth.getInstance().currentUser?.displayName!!, text, time, checkedRating
-                    )).addOnCompleteListener {
-                        dismissProgress()
-                        if (it.isSuccessful) {
-                            toast("댓글 쓰기 성공")
-                            (binding.commentListView.adapter as CommentAdapter).add(
-                                Comment(FirebaseAuth.getInstance().uid?:"", FirebaseAuth.getInstance().currentUser?.displayName!!, text, time, checkedRating)
-                            )
+                    if (uri != null) {
+                        FirebaseStorageManager.upload("comment", uri!!) { resultUri ->
+                            FirebaseDatabase.getInstance().getReference("Comment").child(course.id.toString()).push().setValue(Comment(
+                                FirebaseAuth.getInstance().uid?:"", FirebaseAuth.getInstance().currentUser?.displayName!!, text, time, resultUri.toString(), checkedRating
+                            )).addOnCompleteListener {
+                                dismissProgress()
+                                if (it.isSuccessful) {
+                                    toast("댓글 쓰기 성공")
+                                    (binding.commentListView.adapter as CommentAdapter).add(
+                                        Comment(FirebaseAuth.getInstance().uid?:"", FirebaseAuth.getInstance().currentUser?.displayName!!, text, time, resultUri.toString()
+                                                , checkedRating)
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        FirebaseDatabase.getInstance().getReference("Comment").child(course.id.toString()).push().setValue(Comment(
+                            FirebaseAuth.getInstance().uid?:"", FirebaseAuth.getInstance().currentUser?.displayName!!, text, time, "none", checkedRating
+                        )).addOnCompleteListener {
+                            dismissProgress()
+                            if (it.isSuccessful) {
+                                toast("댓글 쓰기 성공")
+                                (binding.commentListView.adapter as CommentAdapter).add(
+                                    Comment(FirebaseAuth.getInstance().uid?:"", FirebaseAuth.getInstance().currentUser?.displayName!!, text, time, "none", checkedRating)
+                                )
+                            }
                         }
                     }
+
+
                 }
             } else {
                 toast("로그인을 해주세요")
