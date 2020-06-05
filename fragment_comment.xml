@@ -36,50 +36,68 @@
                 android:text="댓글 쓰기" />
         </LinearLayout>
 
-        <RadioGroup
-            android:id="@+id/radio_group"
+        <LinearLayout
+            android:id="@+id/rating_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/comment_input_layout">
 
-            <RadioButton
-                android:id="@+id/one_point"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" ★" />
+            <RadioGroup
+                android:id="@+id/radio_group"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content">
 
-            <RadioButton
-                android:id="@+id/two_point"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" ★ ★" />
+                <RadioButton
+                    android:id="@+id/one_point"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" ★" />
 
-            <RadioButton
-                android:id="@+id/three_point"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" ★ ★ ★ " />
+                <RadioButton
+                    android:id="@+id/two_point"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" ★ ★" />
 
-            <RadioButton
-                android:id="@+id/four_point"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" ★ ★ ★ ★ " />
+                <RadioButton
+                    android:id="@+id/three_point"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" ★ ★ ★ " />
 
-            <RadioButton
-                android:id="@+id/five_point"
-                android:layout_width="wrap_content"
+                <RadioButton
+                    android:id="@+id/four_point"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" ★ ★ ★ ★ " />
+
+                <RadioButton
+                    android:id="@+id/five_point"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text=" ★ ★ ★ ★ ★" />
+            </RadioGroup>
+
+            <ImageView
+                android:id="@+id/comment_img"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text=" ★ ★ ★ ★ ★" />
-        </RadioGroup>
+                android:src="@drawable/ic_menu_gallery"
+                android:adjustViewBounds="true"/>
+        </LinearLayout>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/comment_list_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toBottomOf="@id/radio_group" />
+            app:layout_constraintTop_toBottomOf="@id/rating_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
