@@ -16,13 +16,6 @@ import com.sample.walkcourse.ui.DetailActivity
 import com.sample.walkcourse.ui.home.data.CourseData
 import kotlinx.android.synthetic.main.activity_search.*
 
-
-/**
- *   검색 화면입니다.
- *   정렬 및 필터 기능을 포함하고있습니다.
- *   SortedBy, Filter
- */
-
 class SearchActivity : AppCompatActivity() {
     private var focusPosition = 0
 
