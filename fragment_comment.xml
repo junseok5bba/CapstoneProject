@@ -13,7 +13,7 @@
         <LinearLayout
             android:id="@+id/comment_input_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent">
@@ -43,6 +43,14 @@
             android:orientation="horizontal"
             app:layout_constraintTop_toBottomOf="@id/comment_input_layout">
 
+            <ImageView
+                android:id="@+id/comment_img"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.45"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_picture" />
+
             <RadioGroup
                 android:id="@+id/radio_group"
                 android:layout_width="0dp"
@@ -53,41 +61,34 @@
                     android:id="@+id/one_point"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" ★" />
+                    android:drawableStart="@drawable/ic_onestar" />
 
                 <RadioButton
                     android:id="@+id/two_point"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" ★ ★" />
+                    android:drawableStart="@drawable/ic_twostar" />
 
                 <RadioButton
                     android:id="@+id/three_point"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" ★ ★ ★ " />
+                    android:drawableStart="@drawable/ic_threestar" />
 
                 <RadioButton
                     android:id="@+id/four_point"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" ★ ★ ★ ★ " />
+                    android:drawableStart="@drawable/ic_fourstar" />
 
                 <RadioButton
                     android:id="@+id/five_point"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text=" ★ ★ ★ ★ ★" />
+                    android:drawableStart="@drawable/ic_fivestar" />
             </RadioGroup>
 
-            <ImageView
-                android:id="@+id/comment_img"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_menu_gallery"
-                android:adjustViewBounds="true"/>
         </LinearLayout>
 
 
