@@ -40,23 +40,26 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/black"
-                android:textSize="18sp"
+                android:textSize="22sp"
+                android:drawableStart="@drawable/ic_walk"
                 android:text="@{ @string/merge_walk(walk.walk_count) }"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:textSize="12sp"
+                android:textSize="22sp"
                 android:textColor="@android:color/black"
+                android:drawableStart="@drawable/ic_time2"
                 android:text="@{ walk.time}"/>
 
             <TextView
                 android:id="@+id/walk_calorie"
                 android:layout_marginStart="12dp"
-                android:textSize="12sp"
+                android:textSize="22sp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_fire"/>
         </LinearLayout>
     </LinearLayout>
 </layout>
