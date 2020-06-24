@@ -5,8 +5,17 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_login"
             android:icon="@drawable/ic_menu_gallery"
             android:title="구글 로그인" />
+
+        <item
+            android:id="@+id/nav_walk_history"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="걷기 이력" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="로그아웃" />
     </group>
 </menu>
