@@ -34,13 +34,57 @@
                 app:layout_constraintTop_toBottomOf="@id/map">
 
                 <TextView
+                    android:id="@+id/textView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_weight="1"
+                    android:drawableStart="@drawable/ic_picture2"
                     android:drawablePadding="4dp"
-                    android:drawableStart="@drawable/ic_course"
+                    android:text="코스사진"
                     android:textColor="@android:color/black"
-                    android:textSize="18sp"
-                    android:text="코스경로" />
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/course_first_img"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"/>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/course_second_img"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"/>
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"/>
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/course_third_img"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"/>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:drawableStart="@drawable/ic_course"
+                    android:drawablePadding="4dp"
+                    android:text="코스경로"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/detail_course_desc"
