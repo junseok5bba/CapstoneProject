@@ -1,6 +1,10 @@
 package com.sample.walkcourse.walk
 
 import android.os.Bundle
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.FirebaseDatabase
+import com.sample.basefirebase.database.FirebaseDatabaseManager
 import com.sample.walkcourse.base.BaseActivity
 import com.sample.walkcourse.R
 import com.sample.walkcourse.db.AppDatabase
@@ -11,11 +15,15 @@ class WalkResultActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_walk)
+
+        walk_actionbar_back.setOnClickListener { finish() }
         Thread {
             val walks = AppDatabase.getInstance(this@WalkResultActivity).walkDao().getWalksById(id)
             walk_result_list_view.adapter = WalkResultAdapter().apply {
                 submitList(walks)
             }
+
+
         }.start()
     }
 }
