@@ -10,21 +10,35 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 
+/**
+ *  라이프사이클에 맞게 센서를 연결 및 해제하고
+ *  센서매니저를 활용하는 워크센서매니저입니다
+ */
 class WalkSensorManager(
-    private val context: Context,
+    private var sensorManager: SensorManager,
     private val walkCount: (value: Float) -> Unit) : LifecycleObserver, SensorEventListener {
-    private var sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    private val stepDetectorSensor: Sensor =  sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
-    private val stepCountSensor: Sensor =  sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
+    private val stepDetectorSensor: Sensor? =  sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+    private val stepCountSensor: Sensor? =  sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
 
+    /**
+     *   OnResume 라이프이클 함수 시 연결합니다
+     */
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun connectListener() {
         Log.d("WalkSensorManager", "connectListener")
-        sensorManager.registerListener(this, stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST)
-        sensorManager.registerListener(this, stepCountSensor, SensorManager.SENSOR_DELAY_FASTEST)
+        stepDetectorSensor?.let {
+            sensorManager.registerListener(this, stepDetectorSensor, SensorManager.SENSOR_DELAY_FASTEST)
+        }
+
+        stepCountSensor?.let {
+            sensorManager.registerListener(this, stepCountSensor, SensorManager.SENSOR_DELAY_FASTEST)
+        }
     }
 
+    /**
+     *   ON_PAUSE 라이프이클 함수 시 연결해제합니다. 백그라운드에서 센서가 동작하면 안됩니다.
+     */
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun disconnectListener() {
         Log.d("WalkSensorManager", "disconnectListener")
@@ -35,6 +49,9 @@ class WalkSensorManager(
 
     }
 
+    /**
+     *   SenSor의 값을 받아오는 리스너의 함수입니다.
+     */
     override fun onSensorChanged(event: SensorEvent?) {
         event?.let {
             when(event.sensor.type) {
@@ -48,6 +65,7 @@ class WalkSensorManager(
                 }
                 Sensor.TYPE_STEP_COUNTER -> {
                     if (event.values.isNotEmpty()){
+                        //walkCount(event.values[0])
                         Log.d("WalkSensorManager", event.values[0].toString())
                     } else {
 
