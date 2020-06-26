@@ -1,0 +1,37 @@
+package com.sample.walkcourse.base
+
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Handler
+import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDialog
+
+class BaseProgressDialog(var activity: AppCompatActivity) : AppCompatDialog(activity) {
+    private val handler = Handler()
+    private val runnable = { dismiss() }
+
+    init {
+        setCancelable(false)
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val progress = ProgressBar(activity)
+        progress.isIndeterminate = true
+        //progress.indeterminateDrawable.setColorFilter((R.color.theme_aqua), PorterDuff.Mode.MULTIPLY)
+        setContentView(progress)
+    }
+
+    override fun show() {
+        if (!activity.isFinishing) super.show()
+        handler.postDelayed(runnable, TIMEOUT_SECOND * MILLION_SECOND)
+    }
+
+    override fun dismiss() {
+        if (!activity.isFinishing) super.dismiss()
+        handler.removeCallbacks(runnable)
+    }
+
+    companion object Config {
+        private const val TIMEOUT_SECOND = 30
+        private const val MILLION_SECOND = 1000L
+    }
+}
