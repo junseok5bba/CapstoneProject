@@ -1,0 +1,61 @@
+package com.sample.walkcourse.util
+
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.location.Location
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import com.google.android.gms.location.LocationServices
+import com.sample.walkcourse.extension.isGpsEnabled
+import com.sample.walkcourse.extension.isGranted
+
+class LocationRequest {
+
+    private fun requestLocation(context: Context, onLocation: (latitude: Double, longitude: Double) -> Unit) {
+        if (context.isGpsEnabled()) {
+            LocationServices.getFusedLocationProviderClient(context).run {
+                lastLocation.addOnSuccessListener { location: Location? ->
+                    if (location != null) {
+                        onLocation(location.latitude, location.longitude)
+                    }
+                }
+            }
+        }
+    }
+
+    fun requestLocation(fragment: Fragment, location: (latitude: Double, longitude: Double) -> Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            val context = fragment.context!!
+
+            if (isGrantedLocation(context))
+                requestLocation(context, location)
+            else
+                fragment.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 0)
+        }
+    }
+
+    fun requestLocation(activity: Activity, location: (latitude: Double, longitude: Double) -> Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            val context = activity.baseContext
+
+            if (isGrantedLocation(context))
+                requestLocation(context, location)
+            else
+                activity.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 0)
+        }
+    }
+
+    private fun isGrantedLocation(context: Context): Boolean =
+        context.isGranted(Manifest.permission.ACCESS_FINE_LOCATION) ||
+                context.isGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
+
+
+
+    private fun checkPermission(context: Context) {
+        ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+}
