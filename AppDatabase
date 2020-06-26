@@ -7,9 +7,6 @@ import androidx.room.RoomDatabase
 import com.solar.solarjetpack.room.entity.product.Walk
 import com.solar.solarjetpack.room.entity.product.WalkDao
 
-/**
- *  앱 DB를 생성 및 관리하는 클래스입니다.
- */
 @Database(entities = [Walk::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun walkDao(): WalkDao
