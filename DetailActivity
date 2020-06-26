@@ -48,17 +48,13 @@ import io.ticofab.androidgpxparser.parser.GPXParser
 import io.ticofab.androidgpxparser.parser.domain.Gpx
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.fragment_comment.*
+import kotlinx.android.synthetic.main.fragment_course_detail.*
 import org.xmlpull.v1.XmlPullParserException
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
-
-
-/**
- *   코스 디테일 화면입니다.
- */
 
 class DetailActivity : BaseActivity(), OnMapReadyCallback {
 
@@ -71,12 +67,6 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
     private var uri: Uri? = null
     private lateinit var walkSensorManager: WalkSensorManager
 
-    /**
-     *   onViewCreated
-     *   TabLayout, FragmentViewPager를 구현해놓은 함수로
-     *   onViewCreated는 각 Fragment가 onViewCreated호출될때 리스너를 통해 자신의 바인딩 객체를 전달합니다.
-     *   전달받은 객체를 기반으로 뷰작업을 합니다.
-     */
     private fun initViewPager() {
         tab_layout.let {
             it.setupWithViewPager(fragment_pager)
@@ -113,8 +103,6 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
             walkCount += count.toInt()
         }
 
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             TedPermission.with(this)
                 .setPermissionListener(object: PermissionListener {
@@ -130,13 +118,6 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
                 .setPermissions(Manifest.permission.ACTIVITY_RECOGNITION)
                 .check()
         }
-
-
-        /**
-         *   시작 하면 SensorManager를 동작시킵니다.(lifecycle.addObserver(walkSensorManager))
-         *   종료를 누르면 walkCount 멤버변수를 WalkResultActivity에 값을 전달하고
-         *   AppDatabase.getInstance(this).walkDao().insert(walk)를 실행하여 walk 클래스를 만들어서 이름, 걷은 횟수를 로컬 DB에 저장합니다.
-         */
 
         btn_walk_tracking.setOnClickListener {
             if (btn_walk_tracking.text.toString() == "시작") {
@@ -158,11 +139,27 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
                 val timeStr = min.toString() + "분 " + second.toString() + "초"
 
                 Thread {
-                    val walk = Walk(course.id, course.course_name + " " + course.walk_name, "", timeStr, walkCount)
+                    val date = SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss", Locale.KOREAN).format(System.currentTimeMillis())
+                    val walk = Walk(course.id, course.course_name + " " + course.walk_name, "", timeStr, walkCount, date)
                     AppDatabase.getInstance(this).walkDao().insert(walk)
-                    startActivity(Intent(this, WalkResultActivity::class.java).apply {
-                        putExtra("id", course.id)
-                    })
+
+                    val user = FirebaseAuth.getInstance().currentUser
+                    if (user != null) {
+                        runOnUiThread {
+                            showProgress()
+                        }
+
+                        FirebaseDatabase.getInstance().getReference(user.uid).push().setValue(walk).addOnCompleteListener {
+                            runOnUiThread { dismissProgress() }
+                            startActivity(Intent(this, WalkResultActivity::class.java).apply {
+                                putExtra("id", course.id)
+                            })
+                        }
+                    } else {
+                        startActivity(Intent(this, WalkResultActivity::class.java).apply {
+                            putExtra("id", course.id)
+                        })
+                    }
                 }.start()
             }
         }
@@ -204,6 +201,73 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun gpx(name: String, googleMap: GoogleMap) {
+        val mParser = GPXParser() // con    sider injection
+        var parsedGpx: Gpx? = null
+
+        val input  = getJsonAsset(name)
+        val inputStream = ByteArrayInputStream(input.toByteArray(Charsets.UTF_8))
+
+        try {
+            parsedGpx = mParser.parse(inputStream)
+        } catch (e: IOException) { // do something with this exception
+            e.printStackTrace()
+        } catch (e: XmlPullParserException) {
+            e.printStackTrace()
+        }
+        if (parsedGpx == null) { // error parsing track
+        } else {
+            var swit = false
+            parsedGpx?.let { gpx ->
+                gpx.routes.forEach {
+                    //Log.d("DetailActivity" + it.)
+                }
+
+                gpx.tracks.forEach {
+
+
+                    it.trackSegments.forEach {
+                        val bound = arrayListOf<LatLngBounds>()
+                        val builder = LatLngBounds.builder()
+
+                        it.trackPoints.forEachIndexed { index, trackPoint ->
+                            if (index == 0) {
+                                googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(trackPoint.latitude, trackPoint.longitude)))
+                            }
+
+                            builder.include(LatLng(trackPoint.latitude, trackPoint.longitude))
+
+                            if (index != 0) {
+                                val previous = it.trackPoints[index-1]
+                                val line: Polyline = googleMap.addPolyline(
+                                    PolylineOptions()
+                                        .add(LatLng(previous.latitude, previous.longitude), LatLng(trackPoint.latitude, trackPoint.longitude))
+                                        .width(5f)
+                                        .color(Color.RED)
+                                )
+                            }
+
+                            if (index == it.trackPoints.size - 1) {
+                                latitude = it.trackPoints[index].longitude
+                                longitude = it.trackPoints[index].latitude
+                            }
+
+                            bound.add(builder.build())
+                            Log.d("DetailActivity", trackPoint.latitude.toString())
+                            Log.d("DetailActivity", trackPoint.longitude.toString())
+                        }
+
+                        if (bound.isNotEmpty()) {
+                            if (!swit) {
+                                googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 50))
+                                swit = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private fun kml(name: String, googleMap: GoogleMap) {
 
@@ -217,6 +281,7 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
 
         Log.d("hasPlaceMarks", layer.hasPlacemarks().toString())
     }
+
     private fun bindingCourDetail(binding: FragmentCourseDetailBinding, savedInstanceState: Bundle?) {
         binding.detailCourseDesc.text = course.course_desc
         binding.detailToilit.text = course.toilet
@@ -226,8 +291,46 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
             binding.map.onCreate(it)
         }
         binding.map.getMapAsync(this@DetailActivity)
+
+        FirebaseDatabase.getInstance().getReference("Comment").child(course.id.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) { }
+            override fun onDataChange(p0: DataSnapshot) {
+                var isSetFirstImage = false
+                var isSetSecondImage = false
+                var isSetThirdImage = false
+
+                p0.children.forEach {
+                    val comment = it.getValue(Comment::class.java)
+                    comment?.let {
+                        if (it.img.isNotEmpty()) {
+                            Log.d("imag","? " + it.img)
+                            if (!isSetFirstImage) {
+                                Glide.with(binding.courseFirstImg)
+                                    .load(it.img)
+                                    .into(binding.courseFirstImg)
+                                isSetFirstImage = true
+                            } else {
+                                if (!isSetSecondImage) {
+                                    Glide.with(binding.courseSecondImg)
+                                        .load(it.img)
+                                        .into(binding.courseSecondImg)
+                                    isSetSecondImage = true
+                                } else {
+                                    if (!isSetThirdImage) {
+                                        Glide.with(binding.courseThirdImg)
+                                            .load(it.img)
+                                            .into(binding.courseThirdImg)
+                                        isSetThirdImage = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
     }
-     private fun bindingComment(binding: FragmentCommentBinding) {
+    private fun bindingComment(binding: FragmentCommentBinding) {
         var checkedRating = 5.0f
         binding.radioGroup.setOnCheckedChangeListener { p0, p1 ->
             when(p1) {
@@ -307,8 +410,6 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
                             }
                         }
                     }
-
-
                 }
             } else {
                 toast("로그인을 해주세요")
@@ -321,7 +422,7 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
                 val list = arrayListOf<Comment>()
                 p0.children.forEach {
                     val comment = it.getValue(Comment::class.java)
-                    comment?.let { list.add(it) }
+                    comment?.let {list.add(it) }
                 }
 
                 binding.commentListView.adapter = CommentAdapter().apply {
@@ -350,3 +451,4 @@ class DetailActivity : BaseActivity(), OnMapReadyCallback {
         }
 
     }
+}
