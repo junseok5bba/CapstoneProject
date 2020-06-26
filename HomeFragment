@@ -1,27 +1,26 @@
 package com.sample.walkcourse.ui.home
 
 import android.content.Intent
-import android.graphics.Color
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sample.walkcourse.R
-import com.sample.walkcourse.databinding.FragmentBikeBinding
+import com.sample.walkcourse.util.TextBottomSheet
 import com.sample.walkcourse.databinding.FragmentHomeBinding
-import com.sample.walkcourse.databinding.FragmentWalkBinding
 import com.sample.walkcourse.extension.getJsonAsset
 import com.sample.walkcourse.ui.DetailActivity
 import com.sample.walkcourse.ui.home.data.CourseData
+import com.sample.walkcourse.util.LocationRequest
+import java.text.DecimalFormat
 
 class HomeFragment : Fragment() {
 
@@ -29,6 +28,7 @@ class HomeFragment : Fragment() {
 
     lateinit var bind: FragmentHomeBinding
 
+    private var focusPosition = 0
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -41,6 +41,7 @@ class HomeFragment : Fragment() {
 
         return bind.root
     }
+
     private fun setCourse(home: FragmentHomeBinding, filter: String) {
         val click = { course: CourseData ->
             startActivity(Intent(home.root.context, DetailActivity::class.java).apply {
@@ -53,37 +54,79 @@ class HomeFragment : Fragment() {
         var course = Gson().fromJson<ArrayList<CourseData>>(jsonString, type)
 
         var courseResult = listOf<CourseData>()
+
         when(filter) {
             "distance" -> {
-                courseResult = course.sortedBy { it.distance_km }
+                LocationRequest().requestLocation(this) { latitude, longitude ->
+                    val array = arrayListOf<CourseData>()
+                    course.forEach { courseData ->
+                        val current = Location("").also {
+                            it.latitude = latitude
+                            it.longitude = longitude
+                        }
+
+                        val map = Location("").also {
+                            it.latitude = courseData.latitude
+                            it.longitude = courseData.longitude
+                        }
+
+                        val distance = (current.distanceTo(map) / 1000.0f)
+                        Log.d("distance", "distance ? " + distance.toString())
+                        courseData.distance_between = distance
+                        array.add(courseData)
+                    }
+
+                    Log.d("array", "array size ? " + array.size)
+                    courseResult = array.sortedBy { it.distance_between }
+                    Log.d("distance", "distance size ? " + courseResult.size)
+
+                    home.walkListView.adapter = CourseAdapter(click).apply {
+                        submitList(courseResult)
+                    }
+                }
             }
 
             "course" -> {
                 courseResult = course.sortedBy { it.distance_km }
+                home.walkListView.adapter = CourseAdapter(click).apply {
+                    submitList(courseResult)
+                }
             }
 
             "time" -> {
                 courseResult = course.sortedBy { it.time }
+                home.walkListView.adapter = CourseAdapter(click).apply {
+                    submitList(courseResult)
+                }
             }
 
             "level" -> {
                 courseResult = course.sortedBy { it.level }
+                home.walkListView.adapter = CourseAdapter(click).apply {
+                    submitList(courseResult)
+                }
             }
         }
-        home.walkListView.adapter = CourseAdapter(click).apply {
-            submitList(courseResult)
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 0) {
+
         }
     }
 
     private fun home(home: FragmentHomeBinding) {
         setCourse(home, "course")
 
-
         home.filter.setOnClickListener {
             TextBottomSheet.Builder(it.context)
-                .keys(listOf("course", "time", "level"))
+                .texts(listOf("코스길이순", "소요시간순", "난이도순", "거리순"))
+                .keys(listOf("course", "time", "level", "distance"))
                 .textFontSize(16.0f)
                 .focus(focusPosition)
+                .focusColor(ContextCompat.getColor(bind.root.context, R.color.colorPrimary))
                 .listener(object: TextBottomSheet.OnTextClickListener {
                     override fun onClickItem(index: Int, text: String, key: String) {
                         focusPosition = index
